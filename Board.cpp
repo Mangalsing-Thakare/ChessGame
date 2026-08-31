@@ -891,6 +891,40 @@ bool Board::movePiece(
         return false;
     }
 
+    // =====================================================
+    //                  PAWN PROMOTION
+    // =====================================================
+
+    movedPiece = getPiece(endX, endY);
+
+if (movedPiece != nullptr &&
+    movedPiece->getType() == PieceType::PAWN) {
+
+    bool white = movedPiece->isWhite();
+
+    // White reaches rank 8
+    // Black reaches rank 1
+    if ((white && endY == 7) ||
+        (!white && endY == 0)) {
+
+        // Remove the pawn
+        auto pawn = removePiece(
+            endX,
+            endY
+        );
+
+        // Replace it with a Queen
+        setPiece(
+            endX,
+            endY,
+            std::make_unique<Queen>(
+                white,
+                endX,
+                endY
+            )
+        );
+    }
+}
 
     return true;
 }
