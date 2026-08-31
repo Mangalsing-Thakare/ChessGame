@@ -32,8 +32,16 @@ protected:
     int y;
 
 public:
-    Piece(PieceType type, bool white, int x, int y)
-        : type(type), white(white), x(x), y(y) {}
+    Piece(
+        PieceType type,
+        bool white,
+        int x,
+        int y
+    )
+        : type(type),
+          white(white),
+          x(x),
+          y(y) {}
 
     virtual ~Piece() = default;
 
@@ -59,7 +67,10 @@ public:
         return y;
     }
 
-    void setPosition(int newX, int newY) {
+    void setPosition(
+        int newX,
+        int newY
+    ) {
         x = newX;
         y = newY;
     }
@@ -77,8 +88,17 @@ private:
     bool hasMoved;
 
 public:
-    Pawn(bool white, int x, int y)
-        : Piece(PieceType::PAWN, white, x, y),
+    Pawn(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::PAWN,
+            white,
+            x,
+            y
+        ),
           hasMoved(false) {}
 
     bool canMoveTo(
@@ -107,8 +127,17 @@ public:
 
 class Knight : public Piece {
 public:
-    Knight(bool white, int x, int y)
-        : Piece(PieceType::KNIGHT, white, x, y) {}
+    Knight(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::KNIGHT,
+            white,
+            x,
+            y
+        ) {}
 
     bool canMoveTo(
         int newX,
@@ -128,8 +157,17 @@ public:
 
 class Bishop : public Piece {
 public:
-    Bishop(bool white, int x, int y)
-        : Piece(PieceType::BISHOP, white, x, y) {}
+    Bishop(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::BISHOP,
+            white,
+            x,
+            y
+        ) {}
 
     bool canMoveTo(
         int newX,
@@ -152,8 +190,17 @@ private:
     bool hasMoved;
 
 public:
-    Rook(bool white, int x, int y)
-        : Piece(PieceType::ROOK, white, x, y),
+    Rook(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::ROOK,
+            white,
+            x,
+            y
+        ),
           hasMoved(false) {}
 
     bool canMoveTo(
@@ -182,8 +229,17 @@ public:
 
 class Queen : public Piece {
 public:
-    Queen(bool white, int x, int y)
-        : Piece(PieceType::QUEEN, white, x, y) {}
+    Queen(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::QUEEN,
+            white,
+            x,
+            y
+        ) {}
 
     bool canMoveTo(
         int newX,
@@ -206,8 +262,17 @@ private:
     bool hasMoved;
 
 public:
-    King(bool white, int x, int y)
-        : Piece(PieceType::KING, white, x, y),
+    King(
+        bool white,
+        int x,
+        int y
+    )
+        : Piece(
+            PieceType::KING,
+            white,
+            x,
+            y
+        ),
           hasMoved(false) {}
 
     bool canMoveTo(
@@ -236,7 +301,31 @@ public:
 
 class Board {
 private:
-    std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
+
+    std::unique_ptr<Piece>
+        board[BOARD_SIZE][BOARD_SIZE];
+
+
+    // -------------------------------------------------
+    // Information about the previous move
+    // -------------------------------------------------
+
+    struct MoveInfo {
+
+        int startX;
+        int startY;
+
+        int endX;
+        int endY;
+
+        PieceType pieceType;
+
+        bool valid;
+    };
+
+
+    MoveInfo lastMove;
+
 
 public:
 
@@ -244,7 +333,16 @@ public:
 
     void initialize();
 
-    Piece* getPiece(int x, int y) const;
+
+    // -------------------------------------------------
+    // Board operations
+    // -------------------------------------------------
+
+    Piece* getPiece(
+        int x,
+        int y
+    ) const;
+
 
     void setPiece(
         int x,
@@ -252,12 +350,18 @@ public:
         std::unique_ptr<Piece> piece
     );
 
+
     std::unique_ptr<Piece> removePiece(
         int x,
         int y
     );
 
-    bool isInside(int x, int y) const;
+
+    bool isInside(
+        int x,
+        int y
+    ) const;
+
 
     bool isPathClear(
         int startX,
@@ -266,13 +370,34 @@ public:
         int endY
     ) const;
 
-    bool isInCheck(bool white) const;
 
-    bool hasLegalMove(bool white) const;
+    // -------------------------------------------------
+    // Check / game state
+    // -------------------------------------------------
 
-    bool isCheckmate(bool white) const;
+    bool isInCheck(
+        bool white
+    ) const;
 
-    bool isStalemate(bool white) const;
+
+    bool hasLegalMove(
+        bool white
+    ) const;
+
+
+    bool isCheckmate(
+        bool white
+    ) const;
+
+
+    bool isStalemate(
+        bool white
+    ) const;
+
+
+    // -------------------------------------------------
+    // Normal move
+    // -------------------------------------------------
 
     bool movePiece(
         int startX,
@@ -281,10 +406,20 @@ public:
         int endY
     );
 
+
+    // -------------------------------------------------
+    // Castling
+    // -------------------------------------------------
+
     bool castle(
         int kingY,
         bool kingSide
     );
+
+
+    // -------------------------------------------------
+    // Display
+    // -------------------------------------------------
 
     void display() const;
 };
