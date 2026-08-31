@@ -230,6 +230,8 @@ public:
         int endY
     );
 
+    bool isInCheck(bool white) const;
+
     void display() const;
 };
 

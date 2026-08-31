@@ -71,7 +71,17 @@ bool ChessGame::makeMove(
         return false;
     }
 
+    // Change turn
     whiteTurn = !whiteTurn;
+
+    // Check the new player's king
+    if (board.isInCheck(whiteTurn)) {
+
+        std::cout
+            << "CHECK! "
+            << (whiteTurn ? "White" : "Black")
+            << " king is in check.\n";
+    }
 
     return true;
 }
