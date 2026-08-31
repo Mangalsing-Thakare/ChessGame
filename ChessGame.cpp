@@ -1,5 +1,6 @@
 #include "ChessGame.h"
 #include <iostream>
+#include <cmath>
 
 
 ChessGame::ChessGame()
@@ -24,17 +25,14 @@ bool ChessGame::parsePosition(
     char file = position[0];
     char rank = position[1];
 
-    // Files: a-h
     if (file < 'a' || file > 'h') {
         return false;
     }
 
-    // Ranks: 1-8
     if (rank < '1' || rank > '8') {
         return false;
     }
 
-    // Convert chess notation to array coordinates
     x = file - 'a';
     y = rank - '1';
 
@@ -56,7 +54,8 @@ bool ChessGame::makeMove(
     Piece* piece =
         board.getPiece(startX, startY);
 
-    // No piece at starting position
+
+    // No piece
     if (piece == nullptr) {
 
         std::cout
@@ -66,7 +65,7 @@ bool ChessGame::makeMove(
     }
 
 
-    // Check whether the correct player is moving
+    // Wrong player's piece
     if (piece->isWhite() != whiteTurn) {
 
         std::cout
@@ -78,7 +77,42 @@ bool ChessGame::makeMove(
     }
 
 
-    // Ask Board to perform the move
+    // =================================================
+    //                    CASTLING
+    // =================================================
+
+    if (piece->getType() ==
+            PieceType::KING &&
+
+        startX == 4 &&
+
+        startY == endY &&
+
+        std::abs(endX - startX) == 2) {
+
+        bool kingSide =
+            endX > startX;
+
+
+        if (board.castle(
+                startY,
+                kingSide)) {
+
+            return true;
+        }
+
+
+        std::cout
+            << "Invalid castling.\n";
+
+        return false;
+    }
+
+
+    // =================================================
+    //                  NORMAL MOVE
+    // =================================================
+
     if (!board.movePiece(
             startX,
             startY,
@@ -121,11 +155,9 @@ void ChessGame::play() {
 
     while (true) {
 
-        // Display current board
         board.display();
 
 
-        // Display current player
         std::cout
             << (whiteTurn ? "White" : "Black")
             << "'s turn > ";
@@ -134,10 +166,10 @@ void ChessGame::play() {
         std::string from;
         std::string to;
 
+
         std::cin >> from;
 
 
-        // Exit game
         if (from == "quit") {
             break;
         }
@@ -152,7 +184,7 @@ void ChessGame::play() {
         int endY;
 
 
-        // Convert positions such as e2 -> x,y
+        // Convert chess notation
         if (!parsePosition(
                 from,
                 startX,
@@ -170,7 +202,7 @@ void ChessGame::play() {
         }
 
 
-        // Try to make the move
+        // Try move
         if (!makeMove(
                 startX,
                 startY,
@@ -181,17 +213,13 @@ void ChessGame::play() {
         }
 
 
-        // =============================================
-        // Move was successful
-        // =============================================
-
         // Change turn
         whiteTurn = !whiteTurn;
 
 
-        // =============================================
-        // Checkmate
-        // =============================================
+        // =================================================
+        //                    CHECKMATE
+        // =================================================
 
         if (board.isCheckmate(whiteTurn)) {
 
@@ -206,9 +234,9 @@ void ChessGame::play() {
         }
 
 
-        // =============================================
-        // Stalemate
-        // =============================================
+        // =================================================
+        //                    STALEMATE
+        // =================================================
 
         if (board.isStalemate(whiteTurn)) {
 
@@ -222,9 +250,9 @@ void ChessGame::play() {
         }
 
 
-        // =============================================
-        // Check
-        // =============================================
+        // =================================================
+        //                       CHECK
+        // =================================================
 
         if (board.isInCheck(whiteTurn)) {
 

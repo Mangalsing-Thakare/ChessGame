@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <cmath>
+#include <algorithm>
 
 const int BOARD_SIZE = 8;
 
@@ -18,7 +19,10 @@ enum class PieceType {
 
 class Board;
 
-// ==================== PIECE ====================
+
+// =====================================================
+//                       PIECE
+// =====================================================
 
 class Piece {
 protected:
@@ -64,7 +68,9 @@ public:
 };
 
 
-// ==================== PAWN ====================
+// =====================================================
+//                       PAWN
+// =====================================================
 
 class Pawn : public Piece {
 private:
@@ -95,7 +101,9 @@ public:
 };
 
 
-// ==================== KNIGHT ====================
+// =====================================================
+//                      KNIGHT
+// =====================================================
 
 class Knight : public Piece {
 public:
@@ -114,7 +122,9 @@ public:
 };
 
 
-// ==================== BISHOP ====================
+// =====================================================
+//                      BISHOP
+// =====================================================
 
 class Bishop : public Piece {
 public:
@@ -133,12 +143,18 @@ public:
 };
 
 
-// ==================== ROOK ====================
+// =====================================================
+//                       ROOK
+// =====================================================
 
 class Rook : public Piece {
+private:
+    bool hasMoved;
+
 public:
     Rook(bool white, int x, int y)
-        : Piece(PieceType::ROOK, white, x, y) {}
+        : Piece(PieceType::ROOK, white, x, y),
+          hasMoved(false) {}
 
     bool canMoveTo(
         int newX,
@@ -146,13 +162,23 @@ public:
         const Board& board
     ) const override;
 
+    bool getHasMoved() const {
+        return hasMoved;
+    }
+
+    void setHasMoved(bool value) {
+        hasMoved = value;
+    }
+
     char getSymbol() const override {
         return white ? 'R' : 'r';
     }
 };
 
 
-// ==================== QUEEN ====================
+// =====================================================
+//                      QUEEN
+// =====================================================
 
 class Queen : public Piece {
 public:
@@ -171,12 +197,18 @@ public:
 };
 
 
-// ==================== KING ====================
+// =====================================================
+//                       KING
+// =====================================================
 
 class King : public Piece {
+private:
+    bool hasMoved;
+
 public:
     King(bool white, int x, int y)
-        : Piece(PieceType::KING, white, x, y) {}
+        : Piece(PieceType::KING, white, x, y),
+          hasMoved(false) {}
 
     bool canMoveTo(
         int newX,
@@ -184,19 +216,30 @@ public:
         const Board& board
     ) const override;
 
+    bool getHasMoved() const {
+        return hasMoved;
+    }
+
+    void setHasMoved(bool value) {
+        hasMoved = value;
+    }
+
     char getSymbol() const override {
         return white ? 'K' : 'k';
     }
 };
 
 
-// ==================== BOARD ====================
+// =====================================================
+//                       BOARD
+// =====================================================
 
 class Board {
 private:
     std::unique_ptr<Piece> board[BOARD_SIZE][BOARD_SIZE];
 
 public:
+
     Board();
 
     void initialize();
@@ -223,13 +266,6 @@ public:
         int endY
     ) const;
 
-    bool movePiece(
-        int startX,
-        int startY,
-        int endX,
-        int endY
-    );
-
     bool isInCheck(bool white) const;
 
     bool hasLegalMove(bool white) const;
@@ -237,6 +273,19 @@ public:
     bool isCheckmate(bool white) const;
 
     bool isStalemate(bool white) const;
+
+    bool movePiece(
+        int startX,
+        int startY,
+        int endX,
+        int endY
+    );
+
+    bool castle(
+        int kingY,
+        bool kingSide
+    );
+
     void display() const;
 };
 
