@@ -28,10 +28,7 @@ bool Pawn::canMoveTo(
         );
 
 
-    // -------------------------------------------------
     // One square forward
-    // -------------------------------------------------
-
     if (dx == 0 &&
         dy == direction) {
 
@@ -39,17 +36,13 @@ bool Pawn::canMoveTo(
     }
 
 
-    // -------------------------------------------------
     // Two squares forward
-    // -------------------------------------------------
-
     if (dx == 0 &&
         dy == 2 * direction &&
         !hasMoved) {
 
         int middleY =
             y + direction;
-
 
         return destination == nullptr &&
                board.getPiece(
@@ -59,13 +52,11 @@ bool Pawn::canMoveTo(
     }
 
 
-    // -------------------------------------------------
-    // Normal diagonal capture
-    // -------------------------------------------------
-
+    // Diagonal movement
     if (std::abs(dx) == 1 &&
         dy == direction) {
 
+        // Normal capture
         if (destination != nullptr) {
 
             return destination->isWhite()
@@ -73,58 +64,13 @@ bool Pawn::canMoveTo(
         }
 
 
-        // -------------------------------------------------
         // En passant
-        // -------------------------------------------------
-
-        // The destination is empty.
-        // En passant may therefore be possible.
-
-        // The pawn beside us
-        // must be an opponent pawn.
-
-        int adjacentY = y;
-
-        Piece* adjacentPiece =
-            board.getPiece(
-                newX,
-                adjacentY
-            );
-
-
-        if (adjacentPiece == nullptr) {
-            return false;
-        }
-
-
-        if (adjacentPiece->getType()
-                != PieceType::PAWN) {
-
-            return false;
-        }
-
-
-        if (adjacentPiece->isWhite()
-                == white) {
-
-            return false;
-        }
-
-
-        // The pawn beside us must have
-        // just moved two squares.
-
-        // We cannot directly access
-        // lastMove because it is private.
-        //
-        // Therefore the Board provides
-        // the en-passant decision through
-        // its legal move logic.
-        //
-        // This branch by itself is not enough
-        // to approve the move.
-
-        return false;
+        return board.canEnPassant(
+            x,
+            y,
+            newX,
+            newY
+        );
     }
 
 
@@ -404,14 +350,12 @@ void Board::initialize() {
             0
         );
 
-
     board[0][7] =
         std::make_unique<Rook>(
             true,
             7,
             0
         );
-
 
     board[0][1] =
         std::make_unique<Knight>(
@@ -420,14 +364,12 @@ void Board::initialize() {
             0
         );
 
-
     board[0][6] =
         std::make_unique<Knight>(
             true,
             6,
             0
         );
-
 
     board[0][2] =
         std::make_unique<Bishop>(
@@ -436,7 +378,6 @@ void Board::initialize() {
             0
         );
 
-
     board[0][5] =
         std::make_unique<Bishop>(
             true,
@@ -444,14 +385,12 @@ void Board::initialize() {
             0
         );
 
-
     board[0][3] =
         std::make_unique<Queen>(
             true,
             3,
             0
         );
-
 
     board[0][4] =
         std::make_unique<King>(
@@ -485,14 +424,12 @@ void Board::initialize() {
             7
         );
 
-
     board[7][7] =
         std::make_unique<Rook>(
             false,
             7,
             7
         );
-
 
     board[7][1] =
         std::make_unique<Knight>(
@@ -501,14 +438,12 @@ void Board::initialize() {
             7
         );
 
-
     board[7][6] =
         std::make_unique<Knight>(
             false,
             6,
             7
         );
-
 
     board[7][2] =
         std::make_unique<Bishop>(
@@ -517,7 +452,6 @@ void Board::initialize() {
             7
         );
 
-
     board[7][5] =
         std::make_unique<Bishop>(
             false,
@@ -525,14 +459,12 @@ void Board::initialize() {
             7
         );
 
-
     board[7][3] =
         std::make_unique<Queen>(
             false,
             3,
             7
         );
-
 
     board[7][4] =
         std::make_unique<King>(
@@ -557,7 +489,6 @@ Piece* Board::getPiece(
         return nullptr;
     }
 
-
     return board[y][x].get();
 }
 
@@ -573,7 +504,6 @@ void Board::setPiece(
     if (!isInside(x, y)) {
         return;
     }
-
 
     board[y][x] =
         std::move(piece);
@@ -591,7 +521,6 @@ Board::removePiece(
     if (!isInside(x, y)) {
         return nullptr;
     }
-
 
     return std::move(
         board[y][x]
@@ -672,6 +601,117 @@ bool Board::isPathClear(
 
 
 // =====================================================
+//                    EN PASSANT
+// =====================================================
+
+bool Board::canEnPassant(
+    int startX,
+    int startY,
+    int endX,
+    int endY
+) const {
+
+    Piece* movingPiece =
+        getPiece(
+            startX,
+            startY
+        );
+
+
+    // Moving piece must be a pawn
+    if (movingPiece == nullptr ||
+        movingPiece->getType()
+            != PieceType::PAWN) {
+
+        return false;
+    }
+
+
+    // Destination must be empty
+    if (getPiece(
+            endX,
+            endY
+        ) != nullptr) {
+
+        return false;
+    }
+
+
+    // Must move diagonally one square
+    if (std::abs(endX - startX) != 1 ||
+        std::abs(endY - startY) != 1) {
+
+        return false;
+    }
+
+
+    // There must be a previous move
+    if (!lastMove.valid) {
+        return false;
+    }
+
+
+    // Previous move must be a pawn move
+    if (lastMove.pieceType
+        != PieceType::PAWN) {
+
+        return false;
+    }
+
+
+    // Previous pawn must have moved two squares
+    if (std::abs(
+            lastMove.endY -
+            lastMove.startY
+        ) != 2) {
+
+        return false;
+    }
+
+
+    // Previous pawn must have landed
+    // beside our pawn
+    if (lastMove.endX != endX ||
+        lastMove.endY != startY) {
+
+        return false;
+    }
+
+
+    // The adjacent piece must still be there
+    Piece* adjacentPawn =
+        getPiece(
+            endX,
+            startY
+        );
+
+
+    if (adjacentPawn == nullptr) {
+        return false;
+    }
+
+
+    // It must be a pawn
+    if (adjacentPawn->getType()
+        != PieceType::PAWN) {
+
+        return false;
+    }
+
+
+    // It must belong to the opponent
+    if (adjacentPawn->isWhite()
+        == movingPiece->isWhite()) {
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+// =====================================================
 //                    CHECK DETECTION
 // =====================================================
 
@@ -693,14 +733,17 @@ bool Board::isInCheck(
              x++) {
 
             Piece* piece =
-                getPiece(x, y);
+                getPiece(
+                    x,
+                    y
+                );
 
 
             if (piece != nullptr &&
-                piece->getType() ==
-                    PieceType::KING &&
-                piece->isWhite() ==
-                    white) {
+                piece->getType()
+                    == PieceType::KING &&
+                piece->isWhite()
+                    == white) {
 
                 kingX = x;
                 kingY = y;
@@ -731,7 +774,10 @@ bool Board::isInCheck(
              x++) {
 
             Piece* piece =
-                getPiece(x, y);
+                getPiece(
+                    x,
+                    y
+                );
 
 
             if (piece == nullptr) {
@@ -739,8 +785,8 @@ bool Board::isInCheck(
             }
 
 
-            if (piece->isWhite() ==
-                white) {
+            if (piece->isWhite()
+                == white) {
 
                 continue;
             }
@@ -785,7 +831,8 @@ bool Board::hasLegalMove(
 
 
             if (piece == nullptr ||
-                piece->isWhite() != white) {
+                piece->isWhite()
+                    != white) {
 
                 continue;
             }
@@ -824,7 +871,9 @@ bool Board::hasLegalMove(
 
 
                     Board* mutableBoard =
-                        const_cast<Board*>(this);
+                        const_cast<Board*>(
+                            this
+                        );
 
 
                     auto capturedPiece =
@@ -906,15 +955,15 @@ bool Board::hasLegalMove(
 
                     if (pawn != nullptr) {
 
-                        pawn =
+                        Pawn* restoredPawn =
                             dynamic_cast<Pawn*>(
                                 restoredPiece.get()
                             );
 
 
-                        if (pawn != nullptr) {
+                        if (restoredPawn != nullptr) {
 
-                            pawn->setHasMoved(
+                            restoredPawn->setHasMoved(
                                 pawnHadMoved
                             );
                         }
@@ -1001,76 +1050,43 @@ bool Board::movePiece(
     }
 
 
-    // =================================================
-    // EN PASSANT
-    // =================================================
+    // Validate movement
+    if (!piece->canMoveTo(
+            endX,
+            endY,
+            *this)) {
 
-    bool isEnPassant = false;
+        return false;
+    }
 
 
-    if (piece->getType() ==
-            PieceType::PAWN &&
+    // Determine whether this is en passant
+    bool isEnPassant =
+        piece->getType()
+            == PieceType::PAWN &&
 
         getPiece(
             endX,
             endY
         ) == nullptr &&
 
-        std::abs(endX - startX) == 1 &&
+        std::abs(
+            endX - startX
+        ) == 1 &&
 
-        std::abs(endY - startY) == 1) {
+        std::abs(
+            endY - startY
+        ) == 1 &&
 
-
-        if (lastMove.valid &&
-            lastMove.pieceType ==
-                PieceType::PAWN &&
-
-            lastMove.endX == endX &&
-
-            lastMove.endY == startY &&
-
-            std::abs(
-                lastMove.endY -
-                lastMove.startY
-            ) == 2) {
+        canEnPassant(
+            startX,
+            startY,
+            endX,
+            endY
+        );
 
 
-            Piece* adjacentPawn =
-                getPiece(
-                    endX,
-                    startY
-                );
-
-
-            if (adjacentPawn != nullptr &&
-                adjacentPawn->getType()
-                    == PieceType::PAWN &&
-                adjacentPawn->isWhite()
-                    != piece->isWhite()) {
-
-                isEnPassant = true;
-            }
-        }
-    }
-
-
-    // =================================================
-    // NORMAL MOVEMENT
-    // =================================================
-
-    if (!isEnPassant) {
-
-        if (!piece->canMoveTo(
-                endX,
-                endY,
-                *this)) {
-
-            return false;
-        }
-    }
-
-
-    // Save captured piece
+    // Remove normally captured piece
     auto capturedPiece =
         removePiece(
             endX,
@@ -1078,8 +1094,8 @@ bool Board::movePiece(
         );
 
 
-    // En passant captures the pawn
-    // beside the destination square
+    // En passant removes the pawn
+    // from beside the destination
     if (isEnPassant) {
 
         capturedPiece =
@@ -1106,16 +1122,13 @@ bool Board::movePiece(
     // SAVE PIECE STATE
     // =================================================
 
-    bool wasPawn = false;
-    bool pawnHadMoved = false;
-
     Pawn* pawn = nullptr;
+
+    bool pawnHadMoved = false;
 
 
     if (movingPiece->getType()
         == PieceType::PAWN) {
-
-        wasPawn = true;
 
         pawn =
             dynamic_cast<Pawn*>(
@@ -1133,16 +1146,13 @@ bool Board::movePiece(
     }
 
 
-    bool wasKing = false;
-    bool kingHadMoved = false;
-
     King* king = nullptr;
+
+    bool kingHadMoved = false;
 
 
     if (movingPiece->getType()
         == PieceType::KING) {
-
-        wasKing = true;
 
         king =
             dynamic_cast<King*>(
@@ -1160,16 +1170,13 @@ bool Board::movePiece(
     }
 
 
-    bool wasRook = false;
-    bool rookHadMoved = false;
-
     Rook* rook = nullptr;
+
+    bool rookHadMoved = false;
 
 
     if (movingPiece->getType()
         == PieceType::ROOK) {
-
-        wasRook = true;
 
         rook =
             dynamic_cast<Rook*>(
@@ -1238,7 +1245,7 @@ bool Board::movePiece(
         );
 
 
-        if (wasPawn) {
+        if (pawn != nullptr) {
 
             Pawn* restoredPawn =
                 dynamic_cast<Pawn*>(
@@ -1255,7 +1262,7 @@ bool Board::movePiece(
         }
 
 
-        if (wasKing) {
+        if (king != nullptr) {
 
             King* restoredKing =
                 dynamic_cast<King*>(
@@ -1272,7 +1279,7 @@ bool Board::movePiece(
         }
 
 
-        if (wasRook) {
+        if (rook != nullptr) {
 
             Rook* restoredRook =
                 dynamic_cast<Rook*>(
@@ -1298,24 +1305,22 @@ bool Board::movePiece(
         );
 
 
-        // Restore normal capture
-        if (!isEnPassant) {
-
-            setPiece(
-                endX,
-                endY,
-                std::move(
-                    capturedPiece
-                )
-            );
-        }
-
-        // Restore en passant captured pawn
-        else {
+        // Restore captured piece
+        if (isEnPassant) {
 
             setPiece(
                 endX,
                 startY,
+                std::move(
+                    capturedPiece
+                )
+            );
+
+        } else {
+
+            setPiece(
+                endX,
+                endY,
                 std::move(
                     capturedPiece
                 )
@@ -1342,7 +1347,6 @@ bool Board::movePiece(
         movedPiece->getType()
             == PieceType::PAWN) {
 
-
         bool movedWhite =
             movedPiece->isWhite();
 
@@ -1352,7 +1356,6 @@ bool Board::movePiece(
 
             (!movedWhite &&
              endY == 0)) {
-
 
             removePiece(
                 endX,
@@ -1489,7 +1492,6 @@ bool Board::castle(
     }
 
 
-    // King and rook must not have moved
     if (kingPiece->getHasMoved() ||
         rookPiece->getHasMoved()) {
 
@@ -1497,7 +1499,7 @@ bool Board::castle(
     }
 
 
-    // Squares between them must be empty
+    // Squares between King and Rook
     int start =
         std::min(
             kingX,
@@ -1526,7 +1528,7 @@ bool Board::castle(
     }
 
 
-    // King cannot castle out of check
+    // Cannot castle while in check
     if (isInCheck(
             king->isWhite()
         )) {
@@ -1535,7 +1537,7 @@ bool Board::castle(
     }
 
 
-    // Check square passed through
+    // Check middle square
     int direction =
         kingSide ? 1 : -1;
 
@@ -1599,10 +1601,7 @@ bool Board::castle(
     }
 
 
-    // -------------------------------------------------
     // Move King
-    // -------------------------------------------------
-
     auto finalKing =
         removePiece(
             kingX,
@@ -1639,10 +1638,7 @@ bool Board::castle(
     );
 
 
-    // -------------------------------------------------
     // Move Rook
-    // -------------------------------------------------
-
     auto rookObject =
         removePiece(
             rookX,
@@ -1679,7 +1675,7 @@ bool Board::castle(
     );
 
 
-    // Castling is also a move
+    // Record castling as the last move
     lastMove.startX =
         kingX;
 

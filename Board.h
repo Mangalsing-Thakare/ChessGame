@@ -307,7 +307,7 @@ private:
 
 
     // -------------------------------------------------
-    // Information about the previous move
+    // Information about the immediately previous move
     // -------------------------------------------------
 
     struct MoveInfo {
@@ -364,6 +364,18 @@ public:
 
 
     bool isPathClear(
+        int startX,
+        int startY,
+        int endX,
+        int endY
+    ) const;
+
+
+    // -------------------------------------------------
+    // En passant
+    // -------------------------------------------------
+
+    bool canEnPassant(
         int startX,
         int startY,
         int endX,
