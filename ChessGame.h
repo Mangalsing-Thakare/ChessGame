@@ -2,6 +2,7 @@
 #define CHESS_GAME_H
 
 #include "Board.h"
+#include <string>
 
 class ChessGame {
 private:

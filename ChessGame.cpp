@@ -1,6 +1,5 @@
 #include "ChessGame.h"
 #include <iostream>
-#include <string>
 
 
 ChessGame::ChessGame()
@@ -47,15 +46,17 @@ bool ChessGame::makeMove(
         board.getPiece(startX, startY);
 
     if (piece == nullptr) {
-        std::cout << "No piece at that position.\n";
+        std::cout
+            << "No piece at that position.\n";
         return false;
     }
 
-    // Check whose turn it is
     if (piece->isWhite() != whiteTurn) {
-        std::cout << "It is "
-                  << (whiteTurn ? "White" : "Black")
-                  << "'s turn.\n";
+
+        std::cout
+            << "It is "
+            << (whiteTurn ? "White" : "Black")
+            << "'s turn.\n";
 
         return false;
     }
@@ -82,15 +83,19 @@ void ChessGame::play() {
     std::cout << "       CHESS GAME\n";
     std::cout << "=========================\n";
 
-    std::cout << "\nEnter moves like: e2 e4\n";
-    std::cout << "Enter 'quit' to exit.\n";
+    std::cout
+        << "\nEnter moves like: e2 e4\n";
+
+    std::cout
+        << "Enter 'quit' to exit.\n";
 
     while (true) {
 
         board.display();
 
-        std::cout << (whiteTurn ? "White" : "Black")
-                  << "'s turn > ";
+        std::cout
+            << (whiteTurn ? "White" : "Black")
+            << "'s turn > ";
 
         std::string from;
         std::string to;
@@ -103,8 +108,10 @@ void ChessGame::play() {
 
         std::cin >> to;
 
-        int startX, startY;
-        int endX, endY;
+        int startX;
+        int startY;
+        int endX;
+        int endY;
 
         if (!parsePosition(
                 from,
@@ -115,7 +122,9 @@ void ChessGame::play() {
                 endX,
                 endY)) {
 
-            std::cout << "Invalid position.\n";
+            std::cout
+                << "Invalid position.\n";
+
             continue;
         }
 

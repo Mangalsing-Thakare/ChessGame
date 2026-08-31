@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <memory>
-#include <vector>
 #include <cmath>
 
 const int BOARD_SIZE = 8;
@@ -16,6 +15,10 @@ enum class PieceType {
     QUEEN,
     KING
 };
+
+class Board;
+
+// ==================== PIECE ====================
 
 class Piece {
 protected:
@@ -30,7 +33,11 @@ public:
 
     virtual ~Piece() = default;
 
-    virtual bool canMoveTo(int newX, int newY) const = 0;
+    virtual bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const = 0;
 
     PieceType getType() const {
         return type;
@@ -57,7 +64,7 @@ public:
 };
 
 
-// -------------------- PAWN --------------------
+// ==================== PAWN ====================
 
 class Pawn : public Piece {
 private:
@@ -68,7 +75,11 @@ public:
         : Piece(PieceType::PAWN, white, x, y),
           hasMoved(false) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     bool getHasMoved() const {
         return hasMoved;
@@ -84,14 +95,18 @@ public:
 };
 
 
-// -------------------- KNIGHT --------------------
+// ==================== KNIGHT ====================
 
 class Knight : public Piece {
 public:
     Knight(bool white, int x, int y)
         : Piece(PieceType::KNIGHT, white, x, y) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     char getSymbol() const override {
         return white ? 'N' : 'n';
@@ -99,14 +114,18 @@ public:
 };
 
 
-// -------------------- BISHOP --------------------
+// ==================== BISHOP ====================
 
 class Bishop : public Piece {
 public:
     Bishop(bool white, int x, int y)
         : Piece(PieceType::BISHOP, white, x, y) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     char getSymbol() const override {
         return white ? 'B' : 'b';
@@ -114,14 +133,18 @@ public:
 };
 
 
-// -------------------- ROOK --------------------
+// ==================== ROOK ====================
 
 class Rook : public Piece {
 public:
     Rook(bool white, int x, int y)
         : Piece(PieceType::ROOK, white, x, y) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     char getSymbol() const override {
         return white ? 'R' : 'r';
@@ -129,14 +152,18 @@ public:
 };
 
 
-// -------------------- QUEEN --------------------
+// ==================== QUEEN ====================
 
 class Queen : public Piece {
 public:
     Queen(bool white, int x, int y)
         : Piece(PieceType::QUEEN, white, x, y) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     char getSymbol() const override {
         return white ? 'Q' : 'q';
@@ -144,14 +171,18 @@ public:
 };
 
 
-// -------------------- KING --------------------
+// ==================== KING ====================
 
 class King : public Piece {
 public:
     King(bool white, int x, int y)
         : Piece(PieceType::KING, white, x, y) {}
 
-    bool canMoveTo(int newX, int newY) const override;
+    bool canMoveTo(
+        int newX,
+        int newY,
+        const Board& board
+    ) const override;
 
     char getSymbol() const override {
         return white ? 'K' : 'k';
@@ -159,9 +190,7 @@ public:
 };
 
 
-// =====================================================
-//                       BOARD
-// =====================================================
+// ==================== BOARD ====================
 
 class Board {
 private:
@@ -174,17 +203,32 @@ public:
 
     Piece* getPiece(int x, int y) const;
 
-    void setPiece(int x, int y, std::unique_ptr<Piece> piece);
+    void setPiece(
+        int x,
+        int y,
+        std::unique_ptr<Piece> piece
+    );
 
-    std::unique_ptr<Piece> removePiece(int x, int y);
+    std::unique_ptr<Piece> removePiece(
+        int x,
+        int y
+    );
 
     bool isInside(int x, int y) const;
 
-    bool isPathClear(int startX, int startY,
-                     int endX, int endY) const;
+    bool isPathClear(
+        int startX,
+        int startY,
+        int endX,
+        int endY
+    ) const;
 
-    bool movePiece(int startX, int startY,
-                   int endX, int endY);
+    bool movePiece(
+        int startX,
+        int startY,
+        int endX,
+        int endY
+    );
 
     void display() const;
 };
