@@ -232,6 +232,11 @@ public:
 
     bool isInCheck(bool white) const;
 
+    bool hasLegalMove(bool white) const;
+
+    bool isCheckmate(bool white) const;
+
+    bool isStalemate(bool white) const;
     void display() const;
 };
 

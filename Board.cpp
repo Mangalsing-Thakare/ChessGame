@@ -520,6 +520,154 @@ bool Board::isInCheck(bool white) const {
 }
 
 
+bool Board::hasLegalMove(bool white) const {
+
+    for (int startY = 0; startY < BOARD_SIZE; startY++) {
+        for (int startX = 0; startX < BOARD_SIZE; startX++) {
+
+            Piece* piece = getPiece(startX, startY);
+
+            if (piece == nullptr ||
+                piece->isWhite() != white) {
+                continue;
+            }
+
+            for (int endY = 0; endY < BOARD_SIZE; endY++) {
+                for (int endX = 0; endX < BOARD_SIZE; endX++) {
+
+                    // First check basic movement
+                    if (!piece->canMoveTo(
+                            endX,
+                            endY,
+                            *this)) {
+                        continue;
+                    }
+
+                    Piece* destination =
+                        getPiece(endX, endY);
+
+                    // Cannot capture own piece
+                    if (destination != nullptr &&
+                        destination->isWhite() == white) {
+                        continue;
+                    }
+
+                    // Save destination
+                    auto capturedPiece =
+                        const_cast<Board*>(this)
+                            ->removePiece(endX, endY);
+
+                    // Remove moving piece
+                    auto movingPiece =
+                        const_cast<Board*>(this)
+                            ->removePiece(startX, startY);
+
+                    // Save pawn state
+                    Pawn* pawn = nullptr;
+                    bool pawnHadMoved = false;
+
+                    if (movingPiece->getType() ==
+                        PieceType::PAWN) {
+
+                        pawn =
+                            dynamic_cast<Pawn*>(
+                                movingPiece.get()
+                            );
+
+                        if (pawn != nullptr) {
+                            pawnHadMoved =
+                                pawn->getHasMoved();
+                        }
+                    }
+
+                    // Temporarily make move
+                    movingPiece->setPosition(
+                        endX,
+                        endY
+                    );
+
+                    if (pawn != nullptr) {
+                        pawn->setHasMoved(true);
+                    }
+
+                    const_cast<Board*>(this)
+                        ->setPiece(
+                            endX,
+                            endY,
+                            std::move(movingPiece)
+                        );
+
+                    // Check if King is safe
+                    bool stillInCheck =
+                        isInCheck(white);
+
+                    // Undo move
+                    auto restoredPiece =
+                        const_cast<Board*>(this)
+                            ->removePiece(
+                                endX,
+                                endY
+                            );
+
+                    restoredPiece->setPosition(
+                        startX,
+                        startY
+                    );
+
+                    if (pawn != nullptr) {
+                        Pawn* restoredPawn =
+                            dynamic_cast<Pawn*>(
+                                restoredPiece.get()
+                            );
+
+                        if (restoredPawn != nullptr) {
+                            restoredPawn->setHasMoved(
+                                pawnHadMoved
+                            );
+                        }
+                    }
+
+                    const_cast<Board*>(this)
+                        ->setPiece(
+                            startX,
+                            startY,
+                            std::move(restoredPiece)
+                        );
+
+                    // Restore captured piece
+                    const_cast<Board*>(this)
+                        ->setPiece(
+                            endX,
+                            endY,
+                            std::move(capturedPiece)
+                        );
+
+                    if (!stillInCheck) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+
+bool Board::isCheckmate(bool white) const {
+
+    return isInCheck(white) &&
+           !hasLegalMove(white);
+}
+
+
+bool Board::isStalemate(bool white) const {
+
+    return !isInCheck(white) &&
+           !hasLegalMove(white);
+}
+
+
 // =====================================================
 //                     MOVE PIECE
 // =====================================================
