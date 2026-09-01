@@ -1,4 +1,4 @@
-# ♟️ Chess Game in C++
+# Chess Game in C++
 
 A console-based Chess Game implemented in **C++17**, designed to demonstrate core **Object-Oriented Programming (OOP)** concepts through a real-world system.
 
@@ -6,28 +6,28 @@ The project models the chess board, pieces, movement rules, and game state using
 
 ---
 
-## 🚀 Features
+## Features
 
-- ♟️ Complete chess board representation
-- ♙ Individual classes for each chess piece
-- ♞ Legal piece movement
-- ⚔️ Piece capturing
-- 🔄 Turn management
-- 👑 Check detection
-- ♔ Checkmate detection
-- 🤝 Stalemate detection
-- 🏰 Castling
-- ⚡ En Passant
-- ♕ Pawn Promotion
+-  Complete chess board representation
+-  Individual classes for each chess piece
+-  Legal piece movement
+-  Piece capturing
+-  Turn management
+-  Check detection
+-  Checkmate detection
+-  Stalemate detection
+-  Castling
+-  En Passant
+-  Pawn Promotion
   - Queen
   - Rook
   - Bishop
   - Knight
-- 🛡️ Prevention of moves that leave the player's own King in check
+-  Prevention of moves that leave the player's own King in check
 
 ---
 
-## 🧠 OOP Concepts Demonstrated
+##  OOP Concepts Demonstrated
 
 ### 1. Encapsulation
 
@@ -88,7 +88,7 @@ This provides automatic memory management and clear ownership.
 
 ---
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```text
 ChessGame/
@@ -136,7 +136,7 @@ Responsible for:
 
 ---
 
-## 🎮 How to Run
+##  How to Run
 
 ### Compile
 
@@ -162,7 +162,7 @@ Windows:
 
 ---
 
-## 🎯 How to Play
+##  How to Play
 
 Enter moves using standard chess coordinates:
 
@@ -202,7 +202,7 @@ quit
 
 ---
 
-## 🛠️ Technologies
+##  Technologies
 
 - **C++17**
 - **Object-Oriented Programming**
@@ -212,7 +212,7 @@ quit
 
 ---
 
-## 📌 Future Improvements
+##  Future Improvements
 
 - Graphical User Interface
 - Chess AI opponent
@@ -222,6 +222,3 @@ quit
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License.
