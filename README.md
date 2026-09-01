@@ -181,7 +181,7 @@ quit
 
 ---
 
-## ♟️ Supported Chess Rules
+## Supported Chess Rules
 
 | Rule | Status |
 |------|--------|
