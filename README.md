@@ -216,9 +216,7 @@ quit
 
 - Graphical User Interface
 - Chess AI opponent
-- FEN support
-- PGN game notation
-- Automated unit testing
+- Game History
 
 ---
 
