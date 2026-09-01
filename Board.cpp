@@ -1333,57 +1333,130 @@ bool Board::movePiece(
 
 
     // =================================================
-    // PAWN PROMOTION
-    // =================================================
+// PAWN PROMOTION
+// =================================================
 
-    movedPiece =
-        getPiece(
+movedPiece =
+    getPiece(
+        endX,
+        endY
+    );
+
+if (movedPiece != nullptr &&
+    movedPiece->getType()
+        == PieceType::PAWN) {
+
+    bool movedWhite =
+        movedPiece->isWhite();
+
+    if ((movedWhite &&
+         endY == 7) ||
+
+        (!movedWhite &&
+         endY == 0)) {
+
+        std::cout << "\n";
+        std::cout << "Pawn promotion!\n";
+        std::cout << "Choose a piece:\n";
+        std::cout << "1. Queen\n";
+        std::cout << "2. Rook\n";
+        std::cout << "3. Bishop\n";
+        std::cout << "4. Knight\n";
+
+        int choice;
+
+        while (true) {
+
+            std::cout << "Enter choice: ";
+            std::cin >> choice;
+
+            if (choice >= 1 &&
+                choice <= 4) {
+
+                break;
+            }
+
+            std::cout
+                << "Invalid choice. "
+                   "Enter 1-4.\n";
+        }
+
+
+        // Remove the pawn
+        removePiece(
             endX,
             endY
         );
 
 
-    if (movedPiece != nullptr &&
-        movedPiece->getType()
-            == PieceType::PAWN) {
+        // Create promoted piece
+        switch (choice) {
 
-        bool movedWhite =
-            movedPiece->isWhite();
+            case 1:
 
-
-        if ((movedWhite &&
-             endY == 7) ||
-
-            (!movedWhite &&
-             endY == 0)) {
-
-            removePiece(
-                endX,
-                endY
-            );
-
-
-            setPiece(
-                endX,
-                endY,
-                std::make_unique<Queen>(
-                    movedWhite,
+                setPiece(
                     endX,
-                    endY
-                )
-            );
+                    endY,
+                    std::make_unique<Queen>(
+                        movedWhite,
+                        endX,
+                        endY
+                    )
+                );
+
+                break;
 
 
-            std::cout
-                << (movedWhite
-                    ? "White"
-                    : "Black")
+            case 2:
 
-                << " pawn promoted "
-                   "to Queen!\n";
+                setPiece(
+                    endX,
+                    endY,
+                    std::make_unique<Rook>(
+                        movedWhite,
+                        endX,
+                        endY
+                    )
+                );
+
+                break;
+
+
+            case 3:
+
+                setPiece(
+                    endX,
+                    endY,
+                    std::make_unique<Bishop>(
+                        movedWhite,
+                        endX,
+                        endY
+                    )
+                );
+
+                break;
+
+
+            case 4:
+
+                setPiece(
+                    endX,
+                    endY,
+                    std::make_unique<Knight>(
+                        movedWhite,
+                        endX,
+                        endY
+                    )
+                );
+
+                break;
         }
-    }
 
+
+        std::cout
+            << "Pawn promoted successfully!\n";
+    }
+}
 
     // =================================================
     // SAVE LAST MOVE
