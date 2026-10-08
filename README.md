@@ -98,7 +98,6 @@ ChessGame/
 ├── ChessGame.h
 ├── main.cpp
 ├── .gitignore
-├── LICENSE
 └── README.md
 ```
 
