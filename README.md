@@ -57,13 +57,12 @@ Each derived piece provides its own movement implementation.
 All chess pieces inherit from the base `Piece` class.
 
 ```text
-                 Piece
-                   │
-       ┌───────────┼───────────┐
-       │           │           │
-     Pawn       Knight      Bishop
-       │
-     Rook       Queen        King
+                              Piece
+                               │
+       ┌───────────┼───────────┼───────────┼───────────┼──────────┐
+       │           │           │           |           |          |
+     Pawn       Knight      Bishop        Rook       Queen       King
+     
 ```
 
 ### 4. Runtime Polymorphism
